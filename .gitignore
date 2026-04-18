@@ -3,6 +3,7 @@
 
 # EXCEPT the allowed folders and files
 !/.claude-plugin/
+!/.agents/
 !/plugins/
 !/.github/
 !/.gitignore

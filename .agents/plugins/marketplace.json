@@ -1,0 +1,32 @@
+{
+  "name": "zero-to-launch",
+  "interface": {
+    "displayName": "Zero to Launch"
+  },
+  "plugins": [
+    {
+      "name": "maker",
+      "source": {
+        "source": "local",
+        "path": "./plugins/maker"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "shaper",
+      "source": {
+        "source": "local",
+        "path": "./plugins/shaper"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

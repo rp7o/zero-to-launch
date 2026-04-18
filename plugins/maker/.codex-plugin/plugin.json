@@ -1,0 +1,17 @@
+{
+  "name": "maker",
+  "version": "0.1.0",
+  "description": "Product development companion for building software projects with AI coding agents.",
+  "author": {
+    "name": "RP7O"
+  },
+  "keywords": [
+    "product",
+    "scaffold",
+    "architecture",
+    "fullstack",
+    "frontend",
+    "api"
+  ],
+  "skills": "./skills/"
+}
