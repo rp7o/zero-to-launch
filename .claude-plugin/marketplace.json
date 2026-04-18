@@ -8,7 +8,7 @@
         {
             "name": "maker",
             "description": "Product development companion for building software projects. Use when someone wants to start a new project, explore an idea, make technical decisions, generate code, run quality gates, or iterate on an existing project. Supports frontend apps, APIs, static sites, and fullstack projects.",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "author": {
                 "name": "RP7O"
             },
@@ -19,7 +19,7 @@
         {
             "name": "shaper",
             "description": "Business strategy and validation companion. Helps validate ideas, build lean canvases, research markets, and define product briefs before engineering begins. Use when evaluating a new idea, building a pitch, or running a Go/No-Go gate.",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "author": {
                 "name": "RP7O"
             },
