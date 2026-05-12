@@ -39,3 +39,5 @@ $RECYCLE.BIN/
 *.tmp
 *.temp
 .gemini/
+
+.github/node_modules/

@@ -1,0 +1,9 @@
+{
+    "name": "zero-to-launch-ci",
+    "private": true,
+    "description": "CI-only dependencies for .github/scripts/. Not published.",
+    "type": "module",
+    "dependencies": {
+        "yaml": "2.8.3"
+    }
+}

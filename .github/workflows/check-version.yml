@@ -1,76 +1,76 @@
 name: Check Version Bump
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+    pull_request:
+        types: [opened, synchronize, reopened]
 
 jobs:
-  check-version:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read  # Explicit read-only — no write permissions needed
+    check-version:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read # Explicit read-only — no write permissions needed
 
-    steps:
-      - name: Checkout repository
-        # Pinned to v6.0.2 commit SHA — avoids mutable tag risk
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          fetch-depth: 0
+        steps:
+            - name: Checkout repository
+              # Pinned to v6.0.2 commit SHA — avoids mutable tag risk
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+              with:
+                  fetch-depth: 0
 
-      - name: Check for version bumps
-        env:
-          BASE_REF: ${{ github.base_ref }}
-          HEAD_SHA: ${{ github.sha }}
-        run: |
-          set -euo pipefail
+            - name: Check for version bumps
+              env:
+                  BASE_REF: ${{ github.base_ref }}
+                  HEAD_SHA: ${{ github.sha }}
+              run: |
+                  set -euo pipefail
 
-          # ✅ Sanitise BASE_REF (branch name) before use
-          if [[ ! "$BASE_REF" =~ ^[a-zA-Z0-9._/-]+$ ]]; then
-            echo "❌ Invalid base_ref value: $BASE_REF"
-            exit 1
-          fi
-          # ✅ Sanitise HEAD_SHA (40-char hex) — defence in depth even though
-          # github.sha is server-set
-          if [[ ! "$HEAD_SHA" =~ ^[a-f0-9]{40}$ ]]; then
-            echo "❌ Invalid head sha value: $HEAD_SHA"
-            exit 1
-          fi
+                  # ✅ Sanitise BASE_REF (branch name) before use
+                  if [[ ! "$BASE_REF" =~ ^[a-zA-Z0-9._/-]+$ ]]; then
+                    echo "❌ Invalid base_ref value: $BASE_REF"
+                    exit 1
+                  fi
+                  # ✅ Sanitise HEAD_SHA (40-char hex) — defence in depth even though
+                  # github.sha is server-set
+                  if [[ ! "$HEAD_SHA" =~ ^[a-f0-9]{40}$ ]]; then
+                    echo "❌ Invalid head sha value: $HEAD_SHA"
+                    exit 1
+                  fi
 
-          # Collect changed version files into an array (handles paths with
-          # whitespace and avoids unquoted word-splitting)
-          mapfile -t CHANGED_FILES < <(
-            git diff --name-only "origin/$BASE_REF" "$HEAD_SHA" \
-              | grep -E '(\.claude-plugin/marketplace\.json|plugins/[^/]+/\.claude-plugin/plugin\.json)' \
-              || true
-          )
+                  # Collect changed version files into an array (handles paths with
+                  # whitespace and avoids unquoted word-splitting)
+                  mapfile -t CHANGED_FILES < <(
+                    git diff --name-only "origin/$BASE_REF" "$HEAD_SHA" \
+                      | grep -E '(\.claude-plugin/marketplace\.json|plugins/[^/]+/\.claude-plugin/plugin\.json)' \
+                      || true
+                  )
 
-          if [ "${#CHANGED_FILES[@]}" -eq 0 ]; then
-            echo "No version files modified."
-            exit 0
-          fi
+                  if [ "${#CHANGED_FILES[@]}" -eq 0 ]; then
+                    echo "No version files modified."
+                    exit 0
+                  fi
 
-          for FILE in "${CHANGED_FILES[@]}"; do
-            if [ ! -f "$FILE" ]; then
-              echo "$FILE was deleted, skipping."
-              continue
-            fi
+                  for FILE in "${CHANGED_FILES[@]}"; do
+                    if [ ! -f "$FILE" ]; then
+                      echo "$FILE was deleted, skipping."
+                      continue
+                    fi
 
-            HEAD_VERSION=$(jq -r '.version' "$FILE")
-            BASE_VERSION=$(git show "origin/$BASE_REF:$FILE" 2>/dev/null | jq -r '.version' 2>/dev/null || echo "0.0.0")
+                    HEAD_VERSION=$(jq -r '.version' "$FILE")
+                    BASE_VERSION=$(git show "origin/$BASE_REF:$FILE" 2>/dev/null | jq -r '.version' 2>/dev/null || echo "0.0.0")
 
-            echo "Checking $FILE: Base ($BASE_VERSION) -> Head ($HEAD_VERSION)"
+                    echo "Checking $FILE: Base ($BASE_VERSION) -> Head ($HEAD_VERSION)"
 
-            if [ "$HEAD_VERSION" = "$BASE_VERSION" ]; then
-              echo "❌ Error: Version in $FILE was not bumped (still $BASE_VERSION)."
-              exit 1
-            fi
+                    if [ "$HEAD_VERSION" = "$BASE_VERSION" ]; then
+                      echo "❌ Error: Version in $FILE was not bumped (still $BASE_VERSION)."
+                      exit 1
+                    fi
 
-            LOWEST=$(printf '%s\n' "$BASE_VERSION" "$HEAD_VERSION" | sort -V | head -n1)
+                    LOWEST=$(printf '%s\n' "$BASE_VERSION" "$HEAD_VERSION" | sort -V | head -n1)
 
-            if [ "$LOWEST" = "$HEAD_VERSION" ]; then
-              echo "❌ Error: Version in $FILE was downgraded from $BASE_VERSION to $HEAD_VERSION."
-              exit 1
-            fi
+                    if [ "$LOWEST" = "$HEAD_VERSION" ]; then
+                      echo "❌ Error: Version in $FILE was downgraded from $BASE_VERSION to $HEAD_VERSION."
+                      exit 1
+                    fi
 
-            echo "✅ Version bump successfully detected for $FILE."
-          done
+                    echo "✅ Version bump successfully detected for $FILE."
+                  done
