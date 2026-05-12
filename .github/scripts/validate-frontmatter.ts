@@ -12,10 +12,11 @@ import { parse as parseYaml } from "yaml";
 import { readdir, readFile } from "fs/promises";
 import { basename, join, relative, resolve } from "path";
 
-// Characters that require quoting in YAML values when unquoted:
-// {} [] flow indicators, * anchor/alias, & anchor, # comment,
-// ! tag, | > block scalars, % directive, @ ` reserved
-const YAML_SPECIAL_CHARS = /[{}[\\]*&#!|>%@`]/;
+// YAML reserved indicators that require quoting in plain scalar values.
+// Flow ({}[],), anchor/alias (*&), comment (#), tag (!), block scalars (|>),
+// directive/reserved (%@`), quotes ('"), plus `:` followed by space (mapping
+// marker embedded in value), plus leading `?` or `-` (key/sequence markers).
+const YAML_SPECIAL_CHARS = /[{}\[\]*&#!|>%@`,'"]|:\s|^[?-]/;
 const FRONTMATTER_REGEX = /^---\s*\n([\s\S]*?)---\s*\n?/;
 
 /**
