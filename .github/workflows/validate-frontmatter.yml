@@ -10,14 +10,19 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read  # Explicit read-only — no write permissions needed
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        # Pinned to v4.2.2 commit SHA — avoids mutable tag risk
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
+        # Pinned to v1.2.2 commit SHA — avoids mutable tag risk
+        uses: oven-sh/setup-bun@4bc047ad259df6fc24a6c9b0f9a0cb08cf17fbe
         with:
-          bun-version: latest
+          bun-version: "1.2.13"  # Pinned version — avoids pulling unknown future releases
 
       - name: Install dependencies
         run: bun i yaml
